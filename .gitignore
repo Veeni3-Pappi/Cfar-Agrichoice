@@ -5,3 +5,6 @@ dist/
 !.env.example
 *.log
 .DS_Store
+backend/data/*.sqlite
+backend/data/*.sqlite-shm
+backend/data/*.sqlite-wal

@@ -1,4 +1,4 @@
-import { pool } from '../db.js'
+import { database } from '../db.js'
 
 const productCategories = new Set([
   'briquettes',
@@ -13,12 +13,12 @@ function isPositiveInteger(value) {
 
 export async function getBranches(_request, response, next) {
   try {
-    const result = await pool.query(
+    const branches = database.prepare(
       `SELECT branch_id, branch_name, location
        FROM branches
        ORDER BY branch_name`,
-    )
-    response.json(result.rows)
+    ).all()
+    response.json(branches)
   } catch (error) {
     next(error)
   }
@@ -37,7 +37,7 @@ export async function getProducts(request, response, next) {
       return response.status(400).json({ error: 'branch_id must be a positive whole number.' })
     }
 
-    const result = await pool.query(
+    const products = database.prepare(
       `SELECT
          p.product_id,
          p.product_name,
@@ -48,15 +48,13 @@ export async function getProducts(request, response, next) {
          i.alert_threshold
        FROM products AS p
        LEFT JOIN inventory AS i
-         ON i.product_id = p.product_id
-        AND i.branch_id = $1
+         ON i.product_id = p.product_id AND i.branch_id = ?
        WHERE p.is_active = TRUE
-         AND ($2::text IS NULL OR p.product_type = $2)
+         AND (? IS NULL OR p.product_type = ?)
        ORDER BY p.product_name`,
-      [branchId || null, category || null],
-    )
+    ).all(branchId || null, category || null, category || null)
 
-    response.json(result.rows)
+    response.json(products)
   } catch (error) {
     next(error)
   }
@@ -69,16 +67,15 @@ export async function getInventory(request, response, next) {
       return response.status(400).json({ error: 'Branch ID must be a positive whole number.' })
     }
 
-    const branchResult = await pool.query(
-      'SELECT branch_id, branch_name, location FROM branches WHERE branch_id = $1',
-      [branchId],
-    )
+    const branch = database.prepare(
+      'SELECT branch_id, branch_name, location FROM branches WHERE branch_id = ?',
+    ).get(branchId)
 
-    if (branchResult.rowCount === 0) {
+    if (!branch) {
       return response.status(404).json({ error: 'Branch not found.' })
     }
 
-    const inventoryResult = await pool.query(
+    const inventory = database.prepare(
       `SELECT
          p.product_id,
          p.product_name,
@@ -89,15 +86,18 @@ export async function getInventory(request, response, next) {
          (i.stock_quantity <= i.alert_threshold) AS is_low_stock
        FROM inventory AS i
        JOIN products AS p ON p.product_id = i.product_id
-       WHERE i.branch_id = $1
+       WHERE i.branch_id = ?
          AND p.is_active = TRUE
        ORDER BY p.product_name`,
-      [branchId],
-    )
+    ).all(branchId)
 
     response.json({
-      branch: branchResult.rows[0],
-      inventory: inventoryResult.rows,
+      branch,
+      // SQLite represents TRUE/FALSE as 1/0. Convert the flag for cleaner JSON.
+      inventory: inventory.map((item) => ({
+        ...item,
+        is_low_stock: Boolean(item.is_low_stock),
+      })),
     })
   } catch (error) {
     next(error)
