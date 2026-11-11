@@ -97,7 +97,6 @@ function App() {
 
   useEffect(() => {
     if (!branchId) {
-      setProducts([])
       return
     }
 
