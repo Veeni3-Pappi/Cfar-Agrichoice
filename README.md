@@ -16,6 +16,26 @@ This is the start of the system, not the finished system. Sales checkout, staff 
 
 - Node.js 22.13+ and npm.
 
+## Why Supabase is a good fit for this project
+
+Supabase is a strong next step for CFAR Agrichoice because it gives us the same core relational database strength as PostgreSQL while adding built-in product features that our business app needs:
+
+- PostgreSQL database: the same relational model our business rules expect, including strong typing, joins, transactions, and reporting.
+- Authentication: email/password, OTP, and social login, which we need for staff and admin accounts.
+- Row Level Security (RLS): lets us lock down data so branch managers only see their branch, while the general admin can see the full company view.
+- Session management: built-in auth state and secure user sessions without writing a custom auth system from scratch.
+- Storage and edge functions: useful later for product images, receipt processing, and server-side workflows.
+- API layer: Supabase gives us Postgres plus a managed API and realtime features, which are easier to extend than a one-off SQLite-only app.
+
+This does not mean we should jump from SQLite to Supabase in one step without a plan. SQLite is still the best tool for learning, local development, and quick iteration. Once the app needs real staff roles, secure admin actions, and multi-user access, Supabase becomes the right production architecture. We can keep the same API contracts and switch the backend data source behind the scenes.
+
+A simple transition plan is:
+
+1. Keep the current local SQLite API for local development and demos.
+2. Define the business tables and auth rules in Supabase.
+3. Add admin/staff roles and branch access control in Supabase.
+4. Move the app from local SQLite to Supabase as the trusted production database when the staff workflow is ready.
+
 ## 1. Start the API and create the local database
 
 No PostgreSQL or MySQL server, database account, or password is needed. The API automatically creates `backend/data/agri_choice.sqlite` the first time it starts, then creates the tables and inserts sample branches, products, and stock from `schema.sql` and `seed.sql`.
@@ -53,6 +73,11 @@ Open the local address Vite prints, usually `http://localhost:5173`.
 | GET | `/api/products?branch_id=1` | List products and their stock at one branch. |
 | GET | `/api/products?branch_id=1&category=dragonfruit` | Filter the branch catalog. |
 | GET | `/api/inventory/1` | Get a branch's stock and low-stock flags. |
+| POST | `/api/inventory/restock` | Add harvest or acquired inventory for a branch-product pair. |
+| POST | `/api/orders` | Create a customer order and decrement inventory in a transaction. |
+| GET | `/api/orders/:receiptNo` | Fetch an order with customer, items, and payment details. |
+| POST | `/api/payments/stk-push` | Simulate an MPESA checkout prompt for an order. |
+| POST | `/api/payments/callback` | Update an order and payment status after a payment callback. |
 
 The API uses parameterized SQL for values that come from a request, so user input is not pasted into SQL text.
 

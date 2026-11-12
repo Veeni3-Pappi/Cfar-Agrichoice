@@ -19,6 +19,26 @@ There is deliberately no checkout, stock-restock screen, login, payroll page, or
 
 Authentication and permissions should be in place before adding admin-only actions such as changing stock. We will connect Supabase authentication before exposing those actions.
 
+## 1A. Why Supabase matters for the next phase
+
+Supabase is a good fit for the next phase of this project because it combines PostgreSQL with production-ready auth and session tools. In plain terms, it gives us a stronger database and a safer way to manage user access than the current local SQLite setup.
+
+The important parts are:
+
+- PostgreSQL under the hood: better for real business reporting, inventory, and multi-user operations.
+- Auth and sessions: staff logins, admin access, and role-based permissions are built in instead of custom code.
+- Row Level Security: branch managers can see only their branch, while the general admin can see all branches.
+- Storage and functions: later we can add product photos, receipts, and server-side webhooks without building everything from scratch.
+
+For this repository, the plan is not "throw away SQLite and switch everything today". The better path is:
+
+1. Keep SQLite while learning and testing UI flows.
+2. Use Supabase for the real staff/admin system when the app needs secure access.
+3. Keep the API contract stable so React does not need a complete rewrite when we swap storage providers.
+4. Finalize authentication and permissions before exposing restock or payment actions.
+
+This keeps the app beginner-friendly while still preparing it for a real business system.
+
 ## 2. Run the application
 
 Follow the setup steps in [README.md](./README.md). You will use three things:
