@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router } from 'express';
 import {
   createOrder,
   createStkPush,
@@ -9,18 +9,19 @@ import {
   getProducts,
   handlePaymentCallback,
   restockInventory,
-} from '../controllers/catalogController.js'
+} from '../controllers/catalogController.js';
+import { supabaseAuth } from '../authMiddleware.js';
 
-const router = Router()
+const router = Router();
 
-router.get('/branches', getBranches)
-router.get('/products', getProducts)
-router.get('/inventory/:branchId', getInventory)
-router.post('/inventory/restock', restockInventory)
-router.get('/orders', getOrders)
-router.post('/orders', createOrder)
-router.get('/orders/:receiptNo', getOrderByReceipt)
-router.post('/payments/stk-push', createStkPush)
-router.post('/payments/callback', handlePaymentCallback)
+router.get('/branches', getBranches);
+router.get('/products', getProducts);
+router.get('/inventory/:branchId', getInventory);
+router.post('/inventory/restock', supabaseAuth, restockInventory);
+router.get('/orders', getOrders);
+router.post('/orders', supabaseAuth, createOrder);
+router.get('/orders/:receiptNo', getOrderByReceipt);
+router.post('/payments/stk-push', supabaseAuth, createStkPush);
+router.post('/payments/callback', supabaseAuth, handlePaymentCallback);
 
-export default router
+export default router;
