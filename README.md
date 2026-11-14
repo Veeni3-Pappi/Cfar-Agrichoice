@@ -105,3 +105,17 @@ node --check controllers/catalogController.js
 - **The page has no products:** confirm the API started successfully and that its startup message says the SQLite database is ready.
 
 SQLite is ideal for learning and local development. When the application needs multiple servers or concurrent users in production, we can later migrate to a hosted database without changing the React page's API contract.
+
+## Staff Dashboard (Supabase Auth)
+
+The frontend now includes a protected staff interface:
+- **Login** page (`/login`) – staff authenticate via Supabase email/password.
+- **Dashboard** layout with navigation links to:
+  - **Shop** – placeholder for the original product catalog (you can restore the full UI later).
+  - **Inventory** – table view of the branch inventory (`/dashboard/inventory`).
+  - **Orders** – list of recent orders for the staff's branch (`/dashboard/orders`).
+  - **Reports** – admin‑only page (placeholder) reachable at `/dashboard/reports`.
+- **Routing** is handled by `AppRouter.jsx` with `RequireAuth` guard.
+- All protected API calls include the Supabase JWT via the `Authorization: Bearer <token>` header.
+
+You can now continue enhancing each page (e.g., add restock forms, detailed order view, report charts) and style the UI to match your design preferences.
