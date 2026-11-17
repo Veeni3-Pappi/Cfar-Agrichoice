@@ -3,7 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Dashboard() {
-  const { session } = useAuth();
+  const { session, logout } = useAuth();
   const role = session?.user?.app_metadata?.role || "staff";
 
   return (
@@ -45,11 +45,8 @@ export default function Dashboard() {
           </NavLink>
         )}
         <button
-          onClick={async () => {
-            const { logout } = await import("../context/AuthContext");
-            await logout();
-          }}
-          className="mt-8 w-full py-2 bg-red-600 text-white rounded"
+          onClick={logout}
+          className="mt-8 w-full py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
         >
           Sign Out
         </button>

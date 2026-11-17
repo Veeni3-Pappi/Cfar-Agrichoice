@@ -106,16 +106,48 @@ node --check controllers/catalogController.js
 
 SQLite is ideal for learning and local development. When the application needs multiple servers or concurrent users in production, we can later migrate to a hosted database without changing the React page's API contract.
 
-## Staff Dashboard (Supabase Auth)
+## Staff Dashboard & Supabase Setup
 
-The frontend now includes a protected staff interface:
-- **Login** page (`/login`) – staff authenticate via Supabase email/password.
-- **Dashboard** layout with navigation links to:
-  - **Shop** – placeholder for the original product catalog (you can restore the full UI later).
-  - **Inventory** – table view of the branch inventory (`/dashboard/inventory`).
-  - **Orders** – list of recent orders for the staff's branch (`/dashboard/orders`).
-  - **Reports** – admin‑only page (placeholder) reachable at `/dashboard/reports`.
-- **Routing** is handled by `AppRouter.jsx` with `RequireAuth` guard.
-- All protected API calls include the Supabase JWT via the `Authorization: Bearer <token>` header.
+The application supports Supabase for cloud PostgreSQL database and authentication.
 
-You can now continue enhancing each page (e.g., add restock forms, detailed order view, report charts) and style the UI to match your design preferences.
+### 1. Environment Configuration
+
+Copy the example environment files:
+
+```powershell
+# In backend
+copy backend\.env.example backend\.env
+
+# In frontend
+copy frontend\.env.example frontend\.env
+```
+
+Fill in your Supabase project credentials in both `.env` files:
+- `SUPABASE_URL` / `VITE_SUPABASE_URL`: Your project URL (`https://<project-ref>.supabase.co`)
+- `SUPABASE_ANON_KEY` / `VITE_SUPABASE_ANON_KEY`: Your project Anon public API key
+- `SUPABASE_SERVICE_ROLE_KEY`: Service role secret key (backend only, never commit or expose in frontend)
+- `VITE_SUPABASE_PUBLISHABLE_KEY`: (Optional) Modern publishable key (`sb_publishable_...`)
+
+### 2. Setting Up the Database in Supabase
+
+The PostgreSQL schema and seed files are located in the `supabase/` directory:
+- [supabase/migrations/20261117000000_init_supabase_schema.sql](file:///C:/Users/user/Downloads/Desktop/Cfar/supabase/migrations/20261117000000_init_supabase_schema.sql): Creates all relational tables (`branches`, `products`, `inventory`, `orders`, `order_items`, `payments`, `staff`, `roles`, `payroll`), indexes, and Row Level Security (RLS) policies.
+- [supabase/seed.sql](file:///C:/Users/user/Downloads/Desktop/Cfar/supabase/seed.sql): Populates demo branches, products, and branch stock.
+
+**To run in Supabase:**
+1. Open your [Supabase Dashboard](https://supabase.com/dashboard).
+2. Go to **SQL Editor** -> **New query**.
+3. Paste and run the contents of `supabase/migrations/20261117000000_init_supabase_schema.sql`.
+4. Paste and run the contents of `supabase/seed.sql`.
+
+### 3. Staff Accounts & Permissions
+
+Staff authenticate through Supabase Auth (Email & Password):
+- **Login** page (`/login`) – Staff sign in with their credentials.
+- **Role Assignment:** Per Supabase security standards, authorization data (e.g. `role: "admin" | "staff"` and `branch_id: 1`) is read from `app_metadata` (set by an admin in Supabase), preventing client-side spoofing.
+- **Dashboard layout** with protected routes:
+  - **Shop** – product catalog.
+  - **Inventory** – branch stock (`/dashboard/inventory`).
+  - **Orders** – branch order history (`/dashboard/orders`).
+  - **Reports** – admin-only analytics (`/dashboard/reports`).
+- **Backend API Protection:** Protected endpoints require a valid Supabase JWT via the `Authorization: Bearer <token>` header, verified in [backend/authMiddleware.js](file:///C:/Users/user/Downloads/Desktop/Cfar/backend/authMiddleware.js).

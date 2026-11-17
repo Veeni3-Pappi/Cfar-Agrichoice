@@ -8,3 +8,5 @@ dist/
 backend/data/*.sqlite
 backend/data/*.sqlite-shm
 backend/data/*.sqlite-wal
+.agents/
+skills-lock.json

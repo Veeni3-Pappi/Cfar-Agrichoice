@@ -163,11 +163,12 @@ When changing seed data in an existing database, editing the SQL file alone does
 
 Build one feature at a time and verify it before moving on:
 
-1. **Stock intake and protected restocking:** record harvested/acquired quantities and update inventory in one database transaction. Add Supabase login and role checks before allowing managers to restock.
-2. **Sales and receipts:** validate a customer's cart, create an order and order items, and decrement stock in one SQLite transaction. Use a conditional update so two simultaneous sales cannot sell the same stock.
-3. **Payment integration:** start with a provider sandbox. Verify signed callbacks and reconcile callback events; never mark an order paid simply because the browser says it succeeded.
-4. **Staff and payroll:** build admin-only staff and pay-period screens with careful access controls.
-5. **UI refinement:** replace the starter illustrations and layout with the components and visual direction you will provide.
+1. **Stock intake and protected restocking:** record harvested/acquired quantities and update inventory in one database transaction. Supabase authentication is configured (`/login` and `backend/authMiddleware.js`), protecting `/api/inventory/restock` and `/api/orders`.
+2. **PostgreSQL / Supabase Migration:** The cloud database schema and seed scripts are ready under `supabase/migrations/20261117000000_init_supabase_schema.sql` and `supabase/seed.sql` with Row Level Security (RLS) enabled.
+3. **Sales and receipts:** validate a customer's cart, create an order and order items, and decrement stock in one transaction.
+4. **Payment integration:** start with a provider sandbox. Verify signed callbacks and reconcile callback events; never mark an order paid simply because the browser says it succeeded.
+5. **Staff and payroll:** build admin-only staff and pay-period screens with careful access controls using Supabase `app_metadata` roles.
+6. **UI refinement:** replace starter placeholders with polished production components.
 
 React Router will be useful when the app has separate pages such as catalog, receipt, and admin. The first milestone has only one page, so it avoids adding routing before there is a second route to navigate to.
 

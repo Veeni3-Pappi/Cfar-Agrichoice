@@ -14,7 +14,9 @@ export default function Orders() {
       setLoading(true);
       try {
         const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-        const branchId = session.user?.user_metadata?.branch_id;
+        const branchId =
+          session?.user?.app_metadata?.branch_id ||
+          session?.user?.user_metadata?.branch_id;
         const url = branchId ? `${apiUrl}/orders?branch_id=${branchId}` : `${apiUrl}/orders`;
         const response = await fetch(url, {
           headers: {

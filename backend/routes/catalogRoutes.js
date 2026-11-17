@@ -18,7 +18,7 @@ router.get('/branches', getBranches);
 router.get('/products', getProducts);
 router.get('/inventory/:branchId', getInventory);
 router.post('/inventory/restock', supabaseAuth, restockInventory);
-router.get('/orders', getOrders);
+router.get('/orders', supabaseAuth, getOrders);
 router.post('/orders', supabaseAuth, createOrder);
 router.get('/orders/:receiptNo', getOrderByReceipt);
 router.post('/payments/stk-push', supabaseAuth, createStkPush);

@@ -1,6 +1,5 @@
 // src/pages/Inventory.jsx
 import { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
 
 export default function Inventory() {
@@ -14,8 +13,12 @@ export default function Inventory() {
     const fetchInventory = async () => {
       setLoading(true);
       try {
+        const branchId =
+          session?.user?.app_metadata?.branch_id ||
+          session?.user?.user_metadata?.branch_id ||
+          1;
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL || "http://localhost:3000/api"}/inventory/${session.user.user_metadata.branch_id}`,
+          `${import.meta.env.VITE_API_URL || "http://localhost:3000/api"}/inventory/${branchId}`,
           {
             headers: {
               Authorization: `Bearer ${session.access_token}`,
