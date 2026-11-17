@@ -151,3 +151,10 @@ Staff authenticate through Supabase Auth (Email & Password):
   - **Orders** – branch order history (`/dashboard/orders`).
   - **Reports** – admin-only analytics (`/dashboard/reports`).
 - **Backend API Protection:** Protected endpoints require a valid Supabase JWT via the `Authorization: Bearer <token>` header, verified in [backend/authMiddleware.js](file:///C:/Users/user/Downloads/Desktop/Cfar/backend/authMiddleware.js).
+
+#### Demo Accounts for Testing
+
+| Account Type | Email | Password | Role | Permissions |
+| --- | --- | --- | --- | --- |
+| **Admin** | `admin@agrichoice.com` | `AdminPassword123!` | `admin` | Full access (Shop, Inventory, Orders, Reports) |
+| **Staff** | `staff@agrichoice.com` | `StaffPassword123!` | `staff` | Standard branch access (Shop, Inventory, Orders) |
