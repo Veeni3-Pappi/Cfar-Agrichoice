@@ -1,5 +1,6 @@
-// src/AppRouter.jsx
+// frontend/src/AppRouter.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
+import PublicHome from "./pages/PublicHome";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Shop from "./pages/Shop";
@@ -11,7 +12,13 @@ import RequireAuth from "./components/RequireAuth";
 export default function AppRouter() {
   return (
     <Routes>
+      {/* Public Store Home */}
+      <Route path="/" element={<PublicHome />} />
+
+      {/* Staff / Admin Login */}
       <Route path="/login" element={<Login />} />
+
+      {/* Protected Staff Dashboard */}
       <Route
         path="/dashboard/*"
         element={
@@ -20,14 +27,15 @@ export default function AppRouter() {
           </RequireAuth>
         }
       >
-        <Route index element={<Navigate to="shop" replace />} />
-        <Route path="shop" element={<Shop />} />
+        <Route index element={<Navigate to="inventory" replace />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="orders" element={<Orders />} />
+        <Route path="shop" element={<Shop />} />
         <Route path="reports" element={<Reports />} />
       </Route>
-      {/* Fallback to login if route not found */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+
+      {/* Catch-all redirect to public store */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
