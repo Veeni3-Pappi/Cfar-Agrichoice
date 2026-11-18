@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import dotenv from 'dotenv'
 import { mkdirSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -6,6 +6,10 @@ import { DatabaseSync } from 'node:sqlite'
 
 const backendDirectory = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(backendDirectory, '..')
+
+dotenv.config({ path: resolve(backendDirectory, '.env') })
+dotenv.config()
+
 const databasePath = resolve(
   projectRoot,
   process.env.DB_PATH || 'backend/data/agri_choice.sqlite',
